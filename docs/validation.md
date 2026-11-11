@@ -23,6 +23,8 @@ Local toolchain: macOS 26.7 on Apple Silicon, Apple clang 21.0.0
 | 4D arm64 host | tool4d 21.0 build 21.100301 passes offline checks and real authenticated Redis typed text/BLOB commands over plaintext and verified TLS, including worker ownership/termination assertions |
 | 4D compiler | `Compile project` with empty targets passes syntax/type checking; one warning is the intentional omitted-delta rejection test |
 | Negative runner proof | A temporary ASSERT(False) logs its failure and suppresses PASS despite tool4d exit 0; restored tests pass |
+| Windows x64 CI | Windows Server 2025, MSVC 19.51.36260.0: Release plug-in and native executable build; units, adversarial socket/TLS/mutual-TLS fixtures, repeated load/unload, fresh dependency configuration, offline tool4d 21.0 host checks and native package staging pass in [run 43033046195](https://github.com/miyako/4d-plugin-redis/actions/runs/43033046195), source `4ea5d1764fd72c301a309b6416188a2ddeb7f06d` |
+| Combined package CI | The same run assembles the Windows/macOS inputs, verifies dependency/provenance closure and ZIP/DMG round trips, and passes the offline tool4d smoke test from the extracted combined plug-in; macOS sealing here is ad-hoc/test-only |
 
 Native behavior includes nil versus empty replies, NUL/0xff BLOB payloads,
 strict UTF-8/UTF-16 including supplementary characters and embedded NUL,
@@ -63,10 +65,17 @@ qualify every 4D process termination mode or any Windows runtime.
 
 ## Remaining gates
 
-Windows x64 compilation, runtime, native trust-store/mutual TLS behavior and PE
-import closure must be verified by CI/on Windows. No Windows execution was
-performed locally. The source includes the Windows implementation and native
-toolchain setup, not a claim of qualified Windows support.
+Windows x64 compilation, native transport/TLS fixtures, offline 4D host checks
+and PE dependency validation now have CI evidence. The Windows TLS cases include
+explicit-CA success, DNS SNI and identity checks, mutual TLS, and loading platform
+roots to reject an untrusted chain. They do not establish trust-policy
+equivalence or acceptance against a hosted Redis provider.
+
+Live Redis acceptance through the actual Windows 4D typed text/BLOB API,
+including worker termination cleanup, remains untested. Windows CI's tool4d
+suite runs offline; it is not the authenticated real-Redis host acceptance run
+performed locally on macOS. No Windows execution was performed locally, and
+Windows beta deployment still needs this live-host acceptance.
 
 An Intel Mac and an x86_64 4D runtime have not been tested. Rosetta execution
 of native tests does not establish those host/runtime combinations. macOS
@@ -85,5 +94,6 @@ cleanup remain required lifecycle paths. Cooperative synchronous network waits
 can block the scheduler, even in a worker.
 
 Signing credentials have not been accessed or configured. Developer ID signing,
-notarization, Gatekeeper, signed ZIP/DMG smoke tests, combined Windows/macOS
-package assembly and release publication remain separate acceptance gates.
+notarization, Gatekeeper, production-signed ZIP/DMG smoke tests and release
+publication remain separate acceptance gates. The combined-package CI checks
+above are not production signing or release publication.

@@ -28,7 +28,7 @@ class CMakeDependenciesTests(unittest.TestCase):
             )
             result = subprocess.run(
                 [CMAKE, "-S", str(ROOT / "redis"), "-B", str(root / "build"),
-                 f"-DFETCHCONTENT_SOURCE_DIR_BOOST={boost}"],
+                 f"-DFETCHCONTENT_SOURCE_DIR_BOOST={boost.as_posix()}"],
                 capture_output=True, text=True, timeout=150,
             )
             output = result.stdout + result.stderr
@@ -50,8 +50,8 @@ class CMakeDependenciesTests(unittest.TestCase):
             command = [
                 CMAKE, "-S", str(ROOT / "redis"), "-B", str(build),
                 "-DCMAKE_BUILD_TYPE=Release",
-                f"-DFETCHCONTENT_SOURCE_DIR_BOOST={BOOST_SOURCE}",
-                f"-DCMAKE_MODULE_PATH={modules}",
+                f"-DFETCHCONTENT_SOURCE_DIR_BOOST={BOOST_SOURCE.as_posix()}",
+                f"-DCMAKE_MODULE_PATH={modules.as_posix()}",
             ]
             if os.name == "nt":
                 command.extend(["-A", "x64"])
