@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 #include <limits>
 #include <set>
 
@@ -176,22 +177,30 @@ public:
 };
 
 struct BlobOutput {
-    PA_Variable value{};
+    PA_Handle handle = nullptr;
     explicit BlobOutput(const std::string& bytes) {
         if (!bytes.empty()) {
-            PA_SetBlobVariable(&value, const_cast<char*>(bytes.data()), static_cast<PA_long32>(bytes.size()));
-            if (PA_GetLastError() != eER_NoErr) {
-                PA_ClearVariable(&value);
-                throw Error("sdk_error", "Unable to allocate output BLOB.", "received");
+            handle = PA_NewHandle(static_cast<PA_long32>(bytes.size()));
+            const auto error = PA_GetLastError();
+            if (error != eER_NoErr || !handle) {
+                if (handle) PA_DisposeHandle(handle);
+                handle = nullptr;
+                throw Error("sdk_error", "Unable to allocate output BLOB (SDK " + std::to_string(error) + ").", "received");
             }
-        } else {
-            PA_SetBlobVariable(&value, nullptr, 0);
+            auto* buffer = PA_LockHandle(handle);
+            if (!buffer) {
+                PA_DisposeHandle(handle);
+                handle = nullptr;
+                throw Error("sdk_error", "Unable to lock output BLOB.", "received");
+            }
+            std::memcpy(buffer, bytes.data(), bytes.size());
+            PA_UnlockHandle(handle);
         }
     }
-    ~BlobOutput() { PA_ClearVariable(&value); }
+    ~BlobOutput() { if (handle) PA_DisposeHandle(handle); }
     void commit(PA_PluginParameters params) {
-        PA_SetBlobHandleParameter(params, 3, PA_GetBlobHandleVariable(value));
-        value = {};
+        PA_SetBlobHandleParameter(params, 3, handle);
+        handle = nullptr;
     }
 };
 

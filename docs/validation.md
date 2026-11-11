@@ -16,9 +16,12 @@ Local toolchain: macOS 26.7 on Apple Silicon, Apple clang 21.0.0
 | Native x86_64 | Same units, socket/TLS fixtures and real TLS Redis acceptance pass under Rosetta on Apple Silicon; not an Intel-host or 4D x86_64 runtime test |
 | Real server | Redis 7.2.9 (`080b99d9827eac9e8a6639922d64b8a8cc5c930c`), disposable loopback instance, password authentication, db 1, nondefault client name; plaintext and TLS paths |
 | Portable failure fixtures | No reply, slow/trickling reply, blocked write, disconnect after complete request receipt, malformed response, unsupported push; unusable connections reject subsequent calls and are not replayed |
-| TLS fixtures | Server-observed DNS SNI, trusted wrong DNS certificate, missing IP SAN, untrusted chain, required client certificate rejection and mutual-TLS success; encrypted key fails without prompting |
+| TLS fixtures | Server-observed DNS SNI, trusted wrong DNS certificate, missing IP SAN, untrusted chain (explicit CA and platform roots), required client certificate rejection and mutual-TLS success; encrypted key fails without prompting |
 | Session setup fixture | Exact HELLO 3 AUTH argv including NUL in password, SELECT 3 and CLIENT SETNAME; no hidden PING from connection info |
 | Generated pipeline | Ownership check and 118 canonical helper/packaging tests pass |
+| Native module lifetime | Ten load/unload cycles pass; only FourDPackex is exported, private TLS symbols remain hidden |
+| 4D arm64 host | tool4d 21.0 build 21.100301 passes offline checks and real authenticated Redis typed text/BLOB commands, including worker ownership/termination assertions |
+| 4D compiler | `Compile project` with empty targets passes syntax/type checking; one warning is the intentional omitted-delta rejection test |
 
 Native behavior includes nil versus empty replies, NUL/0xff BLOB payloads,
 strict UTF-8/UTF-16 including supplementary characters and embedded NUL,
@@ -35,13 +38,27 @@ The available local tool4d is **21.0 build 21.100301, macOS arm64**. The project
 compatibilityVersion is 2100 and every command is cooperative (`threadSafe:false`).
 The 4D test project covers offline option validation plus live typed commands,
 BLOB preservation/clearing, exact Unicode/counters, conditional SET, and worker
-ownership/lifecycle. Runtime acceptance must complete before calling this path
-qualified.
+ownership/lifecycle. The actual host path, not only the native library, passed
+against the dedicated Redis instance.
 
-The supported version policy starts at 4D 21.0, subject to that qualification.
+The supported version policy starts at the qualified 4D 21.0 runtime.
 The SDK pin fixes PA_JsonParse's uninitialized-parameter issue. OB Keys (1719),
 introduced in 18 R3, is the newest explicitly executed language command;
 older SDK availability alone is not evidence that older 4D versions work.
+
+The first live run exposed an SDK BLOB output issue: the legacy
+PA_SetBlobVariable/FromUserData path reported `eER_CallNotImplemented` (-1).
+The implementation instead stages bytes in an SDK-allocated PA_Handle using
+PA_NewHandle/PA_LockHandle, and transfers it through PA_SetBlobHandleParameter
+only after the result is constructed. The caller's original BLOB is untouched
+until that final commit. A real host round trip of `[0,255,65,0,128]` now passes;
+this is not an object BLOB property or Pointer workaround.
+
+The worker test publishes a live worker-owned handle through a shared object,
+asserts wrong_owner from the parent, kills the worker, then observes
+invalid_handle within a bounded wait. Thus kCloseProcess owner cleanup is
+observed for this cooperative worker termination on this runtime. It does not
+qualify every 4D process termination mode or any Windows runtime.
 
 ## Remaining gates
 

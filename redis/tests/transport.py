@@ -121,7 +121,8 @@ def run_case(mode, context=None, ca=None, host=None, tls_reject=False, identity=
         thread.join(timeout=5)
         if thread.is_alive() or failures or result.returncode or result.stdout.strip() != "PASS":
             raise RuntimeError(f"{mode}/{host}: {failures} {result.stdout} {result.stderr}")
-        print(f"PASS {mode}/{host or 'plaintext'}")
+        endpoint = host or ("system-roots" if context else "plaintext")
+        print(f"PASS {mode}/{endpoint}")
 
 
 def certificate(root, name, hostname="localhost"):
@@ -153,6 +154,7 @@ def main():
         run_case("open-fail", context, cert, "127.0.0.1", tls_reject=True)
         assert names == [None], names
         run_case("open-fail", context, untrusted, "localhost", tls_reject=True)
+        run_case("open-fail-system", context, tls_reject=True)
         wrong_cert, wrong_key = certificate(root, "wrong-host", "wrong.invalid")
         wrong_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         wrong_context.load_cert_chain(wrong_cert, wrong_key)

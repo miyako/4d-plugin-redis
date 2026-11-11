@@ -67,7 +67,7 @@ void transport(const std::string& mode, int port, const std::string& ca = {},
     settings.port = port;
     settings.connectTimeout = 800;
     settings.commandTimeout = 150;
-    settings.tls = !ca.empty();
+    settings.tls = !ca.empty() || mode == "open-fail-system";
     settings.caFile = ca;
     settings.certFile = cert;
     settings.keyFile = key;
@@ -81,7 +81,7 @@ void transport(const std::string& mode, int port, const std::string& ca = {},
         settings.database = 3;
         settings.clientName = "4d:fixture";
     }
-    if (mode == "open-fail") {
+    if (mode == "open-fail" || mode == "open-fail-system") {
         error("open_failed", [&] { Client client(settings); }, "not_submitted");
         return;
     }
