@@ -6,8 +6,10 @@ integration, or replacement of 4D's internal cache.
 
 [日本語](README.ja.md) · [Dependency decision and provenance](docs/dependencies.md)
 
-**Development preview, version 0.1.0. No release has been published.** The build
-targets macOS universal (arm64/x86_64, deployment target 11.0) and Windows x64.
+**Preview release [0.1.2](https://github.com/miyako/4d-plugin-redis/releases/tag/v0.1.2)
+is available.** Packages include macOS universal (arm64/x86_64, deployment
+target 11.0) and Windows x64 binaries. The macOS distribution is Developer ID
+signed and notarized; the Windows executable is unsigned.
 See [validation](#validation) for the distinction between targets and tested
 platforms. The supported 4D floor is deliberately **4D 21.0**, not a claim that
 older versions cannot load the SDK. The protocol feature floor is Redis
@@ -20,14 +22,23 @@ UI even when called from a cooperative worker.
 
 ## Installation
 
-Build from source, then copy `redis.bundle` (macOS), or the complete `redis`
-folder containing `Contents/Windows64/redis.4DX` (Windows), into the host
-application's `Plugins` folder. Restart 4D. Do not copy just the executable.
+Download the [0.1.2 ZIP](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/redis-0.1.2.zip)
+for macOS or Windows, or the [DMG](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/redis-0.1.2.dmg)
+for macOS. [SHA256SUMS](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/SHA256SUMS)
+and provenance/notarization records are available on the release page.
+
+Extract the ZIP, or mount the DMG on macOS, and copy the complete `redis.bundle`
+directory into the host application's `Plugins` folder. It contains both
+`Contents/MacOS/redis` and `Contents/Windows64/redis.4DX`, plus the required
+resources. Restart 4D. Do not copy just the executable.
 For client/server use, install on each host that actually executes the commands.
 Handles belong to that runtime, not to the database or a remote client.
+Retain the accompanying license and attribution files when redistributing.
 
-There are no release downloads yet. Do not treat a locally built or CI test-only
-ad-hoc-signed bundle as a signed/notarized distribution.
+For [source builds](#build-and-test), copy the generated `redis.bundle` on
+macOS, or the complete `redis` folder containing `Contents/Windows64/redis.4DX`
+on Windows. Local builds and CI test-only ad-hoc signatures are not equivalent
+to the signed/notarized release distribution.
 
 ## Quick start
 
@@ -290,7 +301,10 @@ acceptance runs; a PASS in that mode does not imply live Redis validation.
 ### Validation
 
 Validation evidence and remaining platform/release gates are recorded in
-[docs/validation.md](docs/validation.md). 4D 21.0 is a conservative supported
+[docs/validation.md](docs/validation.md). Release CI passed native and offline
+tool4d checks on macOS and Windows, plus a signed-package smoke test on macOS.
+Live Redis acceptance through the actual Windows 4D text/BLOB API and worker
+cleanup remains unverified. 4D 21.0 is a conservative supported
 floor based on runtime qualification, not an SDK minimum inference. The newest
 language command invoked through the SDK is OB Keys (1719), introduced in
 18 R3; this alone does **not** qualify all earlier 4D versions.
@@ -317,9 +331,12 @@ Release is manual on main and requires the `release-signing` environment:
 `KEYCHAIN_PASSWORD`, `NOTARYTOOL_APPLE_ID`, `NOTARYTOOL_TEAM_ID`, and
 `NOTARYTOOL_PASSWORD` (see the generated
 release workflow for the authoritative names). Setup is user-run; agents do
-not read or upload credentials. No signing setup or release is part of this
-preview. macOS distributions require Developer ID/notarization acceptance;
-the Windows distribution is explicitly unsigned.
+not read or upload credentials. The release pipeline Developer ID signs and
+notarizes the macOS distribution, staples and assesses the DMG, verifies the
+archives, and smoke-tests the signed packaged plug-in before publication.
+It creates a verified draft release for a maintainer to publish.
+The Windows executable remains unsigned; the macOS bundle signature is not
+a Windows Authenticode signature.
 
 ## License and attribution
 

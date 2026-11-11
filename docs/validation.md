@@ -1,7 +1,9 @@
 # Validation and qualification gates
 
-This preview is not a published or signed release. Build targets are not
-equivalent to runtime qualification.
+Preview release [0.1.2](https://github.com/miyako/4d-plugin-redis/releases/tag/v0.1.2)
+was published on 2026-11-11 with Developer ID signed/notarized macOS packages
+and an unsigned Windows x64 executable. Build targets and successful release
+packaging are not equivalent to full runtime qualification.
 
 Local toolchain: macOS 26.7 on Apple Silicon, Apple clang 21.0.0
 (`clang-2100.1.1.101`), CMake 4.4.3, C++20 Release.
@@ -25,6 +27,7 @@ Local toolchain: macOS 26.7 on Apple Silicon, Apple clang 21.0.0
 | Negative runner proof | A temporary ASSERT(False) logs its failure and suppresses PASS despite tool4d exit 0; restored tests pass |
 | Windows x64 CI | Windows Server 2025, MSVC 19.51.36260.0: Release plug-in and native executable build; units, adversarial socket/TLS/mutual-TLS fixtures, repeated load/unload, fresh dependency configuration, offline tool4d 21.0 host checks and native package staging pass in [run 43033046195](https://github.com/miyako/4d-plugin-redis/actions/runs/43033046195), source `4ea5d1764fd72c301a309b6416188a2ddeb7f06d` |
 | Combined package CI | The same run assembles the Windows/macOS inputs, verifies dependency/provenance closure and ZIP/DMG round trips, and passes the offline tool4d smoke test from the extracted combined plug-in; macOS sealing here is ad-hoc/test-only |
+| Signed release 0.1.2 | [Release run 43036770788](https://github.com/miyako/4d-plugin-redis/actions/runs/43036770788), source `3e08ea357da57c85155066366b159cf692e8b2a3`, passes both platform builds/tests, combined assembly, Developer ID/hardened-runtime signature checks, ZIP/DMG notarization, DMG stapling/Gatekeeper assessment, signed-package offline tool4d smoke testing and verified draft creation; both published notarization receipts report `Accepted` |
 
 Native behavior includes nil versus empty replies, NUL/0xff BLOB payloads,
 strict UTF-8/UTF-16 including supplementary characters and embedded NUL,
@@ -93,7 +96,8 @@ hard-real-time DNS teardown are not promised. Explicit Close and plug-in unload
 cleanup remain required lifecycle paths. Cooperative synchronous network waits
 can block the scheduler, even in a worker.
 
-Signing credentials have not been accessed or configured. Developer ID signing,
-notarization, Gatekeeper, production-signed ZIP/DMG smoke tests and release
-publication remain separate acceptance gates. The combined-package CI checks
-above are not production signing or release publication.
+Release 0.1.2 passed production Developer ID signing, notarization, DMG
+stapling/Gatekeeper assessment, distribution verification and a signed-package
+offline tool4d smoke test in CI. This supersedes the earlier test-only ad-hoc
+packaging evidence; it does not qualify every installation/OS combination or
+the remaining live Windows host cases. The Windows executable is unsigned.
