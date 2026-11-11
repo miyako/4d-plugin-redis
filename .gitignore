@@ -1,0 +1,24 @@
+.DS_Store
+**/build/
+**/__pycache__/
+redis/redis-test/Plugins/
+redis/redis-test/Data/
+redis/redis-test/Project/DerivedData/
+redis/redis-test/Logs/
+redis/redis-test/userPreferences.*
+.test-runtime/
+# BEGIN 4D PLUGIN PIPELINE (managed)
+/redis/build/
+/redis/redis-test/Plugins/
+/.local-tools/
+/.package-inputs/
+/.package-validation/
+/.release-package/
+/.signed-distribution/
+/.signed-extracted/
+/.publish-extracted/
+/.draft-upload-check/
+/.draft-extracted/
+/.release-notes
+__pycache__/
+# END 4D PLUGIN PIPELINE (managed)

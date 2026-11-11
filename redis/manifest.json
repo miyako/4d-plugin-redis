@@ -1,0 +1,20 @@
+{
+  "name": "redis",
+  "id": 31085,
+  "commands": [
+    {"theme": "Redis", "syntax": "REDIS Open(&J):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Close(&L):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Connection info(&L):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Get text(&L;&T):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Set text(&L;&T;&T;&J):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Get blob(&L;&T;&O):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Set blob(&L;&T;&O;&J):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Delete(&L;&C):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Exists(&L;&C):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Increment(&L;&T;&T):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Expire(&L;&T;&T):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS TTL(&L;&T):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Persist(&L;&T):J", "threadSafe": false},
+    {"theme": "Redis", "syntax": "REDIS Ping(&L):J", "threadSafe": false}
+  ]
+}
