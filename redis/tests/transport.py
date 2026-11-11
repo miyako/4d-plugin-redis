@@ -73,7 +73,7 @@ def serve(listener, mode, failures, context=None, tls_reject=False):
                         for byte in b"+OK\r\n":
                             sock.sendall(bytes([byte]))
                             time.sleep(0.06)
-                    except (BrokenPipeError, ConnectionResetError):
+                    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
                         pass
                 elif mode == "push":
                     sock.sendall(b">2\r\n+message\r\n+unsupported\r\n")
