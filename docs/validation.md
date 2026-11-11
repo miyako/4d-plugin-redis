@@ -20,8 +20,9 @@ Local toolchain: macOS 26.7 on Apple Silicon, Apple clang 21.0.0
 | Session setup fixture | Exact HELLO 3 AUTH argv including NUL in password, SELECT 3 and CLIENT SETNAME; no hidden PING from connection info |
 | Generated pipeline | Ownership check and 118 canonical helper/packaging tests pass |
 | Native module lifetime | Ten load/unload cycles pass; only FourDPackex is exported, private TLS symbols remain hidden |
-| 4D arm64 host | tool4d 21.0 build 21.100301 passes offline checks and real authenticated Redis typed text/BLOB commands, including worker ownership/termination assertions |
+| 4D arm64 host | tool4d 21.0 build 21.100301 passes offline checks and real authenticated Redis typed text/BLOB commands over plaintext and verified TLS, including worker ownership/termination assertions |
 | 4D compiler | `Compile project` with empty targets passes syntax/type checking; one warning is the intentional omitted-delta rejection test |
+| Negative runner proof | A temporary ASSERT(False) logs its failure and suppresses PASS despite tool4d exit 0; restored tests pass |
 
 Native behavior includes nil versus empty replies, NUL/0xff BLOB payloads,
 strict UTF-8/UTF-16 including supplementary characters and embedded NUL,

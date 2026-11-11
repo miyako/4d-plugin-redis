@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<Preferences4D xmlns="http://www.4d.com/namespace/reserved/2004/backup">
+	<Backup>
+		<Settings>
+			<Advanced>
+				<AutomaticRestore>False</AutomaticRestore>
+				<AutomaticLogIntegration>False</AutomaticLogIntegration>
+				<AutomaticRestart>False</AutomaticRestart>
+				<BackupIfDataChange>False</BackupIfDataChange>
+			</Advanced>
+			<General>
+				<IncludeStructureFile>False</IncludeStructureFile>
+				<IncludeDataFile>False</IncludeDataFile>
+				<IncludeAltStructFile>False</IncludeAltStructFile>
+			</General>
+			<Scheduler>
+				<Frequency>Never</Frequency>
+			</Scheduler>
+		</Settings>
+	</Backup>
+</Preferences4D>

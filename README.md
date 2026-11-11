@@ -84,6 +84,10 @@ positive 32-bit Integer/Longint ID, never a pointer.
 Other than Open, the first parameter is always `connection : Integer`.
 Delete/Exists require 1..10000 keys; duplicate keys retain Redis's own counting
 semantics. Empty Text keys and values are permitted.
+Supply every required argument, especially Get blob's writable output. 4D can
+substitute typed defaults for omitted plug-in arguments and issue a compiler
+warning rather than a hard error; only the trailing options Objects documented
+above are intended to be omitted.
 
 `REDIS Connection info` is strictly local: it does **not** ping, reconnect, or
 return credentials, TLS paths, username, password, or client name. `connected`
@@ -157,6 +161,7 @@ Real/Number counter convenience that could silently round.
 Unknown properties and null/wrong-type properties are errors. Omitted options
 use defaults. TLS files with `tls:false` and an unpaired certificate/key are
 errors. Do not put credentials in the host or key names. There is no URI parser.
+Use ASCII/punycode DNS names; the plug-in does not perform IDNA conversion.
 
 Open connects, negotiates **RESP3** (`HELLO 3`, optionally `AUTH`), selects the
 database, optionally sets the client name, and checks PING before returning a
