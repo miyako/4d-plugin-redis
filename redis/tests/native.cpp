@@ -179,6 +179,9 @@ int main(int argc, char** argv) {
         else throw std::runtime_error("Expected mode and optional test server port");
         std::cout << "PASS\n";
         return 0;
+    } catch (const Error& e) {
+        std::cerr << "FAIL: " << e.code << " (" << e.outcome << "): " << e.what() << '\n';
+        return 1;
     } catch (const std::exception& e) {
         std::cerr << "FAIL: " << e.what() << '\n';
         return 1;

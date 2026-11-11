@@ -1,6 +1,8 @@
 """Portable adversarial RESP fixtures; these are not a substitute for real Redis."""
 
 import os
+from contextlib import ExitStack
+import selectors
 import socket
 import ssl
 import subprocess
@@ -26,9 +28,12 @@ def command(stream):
     return parts
 
 
-def serve(listener, mode, failures, context=None, tls_reject=False):
+def serve(selector, mode, failures, context=None, tls_reject=False):
     try:
-        sock, _ = listener.accept()
+        ready = selector.select(timeout=5)
+        if not ready:
+            raise TimeoutError("Fixture did not receive a connection")
+        sock, _ = ready[0][0].fileobj.accept()
         with sock:
             sock.settimeout(4)
             if context is not None:
@@ -97,18 +102,29 @@ def serve(listener, mode, failures, context=None, tls_reject=False):
             assert command(stream) is None
     except Exception as exc:
         failures.append(exc)
-    finally:
-        listener.close()
 
 
 def run_case(mode, context=None, ca=None, host=None, tls_reject=False, identity=None):
     failures = []
-    with socket.socket() as listener:
-        listener.bind(("127.0.0.1", 0))
-        listener.listen(1)
-        listener.settimeout(5)
-        port = listener.getsockname()[1]
-        thread = threading.Thread(target=serve, args=(listener, mode, failures, context, tls_reject))
+    with ExitStack() as stack:
+        selector = stack.enter_context(selectors.DefaultSelector())
+        addresses = [(socket.AF_INET, "127.0.0.1")]
+        if host == "localhost" and any(
+            item[0] == socket.AF_INET6
+            for item in socket.getaddrinfo("localhost", None, type=socket.SOCK_STREAM)
+        ):
+            addresses.append((socket.AF_INET6, "::1"))
+        port = 0
+        for family, address in addresses:
+            listener = stack.enter_context(socket.socket(family, socket.SOCK_STREAM))
+            if family == socket.AF_INET6:
+                listener.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1)
+            listener.bind((address, port))
+            listener.listen(1)
+            listener.settimeout(5)
+            port = listener.getsockname()[1]
+            selector.register(listener, selectors.EVENT_READ)
+        thread = threading.Thread(target=serve, args=(selector, mode, failures, context, tls_reject))
         thread.start()
         args = [sys.argv[1], mode, str(port)]
         if os.environ.get("REDIS_TEST_ARCH"):
