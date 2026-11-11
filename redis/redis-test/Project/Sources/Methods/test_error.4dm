@@ -1,0 +1,11 @@
+//%attributes = {"invisible":true,"preemptive":"incapable"}
+#DECLARE($result : Object; $outcome : Text; $usable : Boolean)
+ASSERT(Value type($result.ok)=Is boolean)
+ASSERT(Not($result.ok))
+ASSERT(Value type($result.code)=Is text)
+ASSERT(Length($result.code)>0)
+ASSERT(Value type($result.message)=Is text)
+ASSERT(Length($result.message)>0)
+test_exact_text($result.outcome; $outcome)
+ASSERT(Value type($result.connectionUsable)=Is boolean)
+ASSERT($result.connectionUsable=$usable)

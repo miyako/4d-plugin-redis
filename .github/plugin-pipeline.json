@@ -1,0 +1,44 @@
+{
+  "build_dir": "redis/build",
+  "bundle_identifier": "com.miyako.redis",
+  "dependencies": {
+    "allowed_licenses": [
+      "Apache-2.0",
+      "BSL-1.0"
+    ],
+    "components": {
+      "boost": {
+        "license": "BSL-1.0",
+        "notice": "boost.txt",
+        "platforms": [
+          "macos",
+          "windows"
+        ]
+      },
+      "openssl": {
+        "license": "Apache-2.0",
+        "notice": "openssl.txt",
+        "platforms": [
+          "macos",
+          "windows"
+        ]
+      }
+    },
+    "copyleft_acknowledged": [],
+    "notices_dir": "THIRD-PARTY-NOTICES",
+    "profile": "static",
+    "windows": "none"
+  },
+  "macos_deployment_target": "11.0",
+  "native_tests": true,
+  "product": "redis",
+  "profile": "macos-universal-windows-x64",
+  "release_branch": "main",
+  "schema": 1,
+  "sdk_dir": "4D-Plugin-SDK",
+  "signing_environment": "release-signing",
+  "signing_policy": "developer-id",
+  "source_dir": "redis",
+  "startup_method": "test_all",
+  "test_project": "redis/redis-test/Project/redis.4DProject"
+}
