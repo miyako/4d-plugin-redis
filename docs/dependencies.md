@@ -32,6 +32,16 @@ DLLs/providers and an extra NASM requirement. No FIPS validation is claimed.
 OpenSSL's pinned configuration selects `/MT` for static library compilation;
 the plug-in uses the same CRT.
 
+Boost resolves the private OpenSSL imported targets through a project-generated
+CMake config package, scoped to Boost configuration. It does not search for an
+already installed OpenSSL: the headers and libraries are intentionally produced
+later by ExternalProject. CMake's stock Windows FindOpenSSL module overwrites
+the library-path output variables while searching, which previously disabled
+Boost.Redis and leaked `_redis_dependencies-NOTFOUND.lib` into the link. A fresh
+configuration regression test blocks system discovery and checks configuration
+before any private OpenSSL library exists. An incomplete Redis link interface
+now fails during configuration, not at link time.
+
 The upstream Boost.Redis CMake interface links all Asio features, including
 stackful `spawn` and architecture-specific Boost.Context assembly. This plug-in
 uses only callbacks and `Boost::asio_core`, so its CMake narrows the Redis

@@ -27,9 +27,17 @@ FetchContent_Declare(Boost
     URL_HASH SHA256=9bed76128d4e46755dbe818487788c6fceb6f72b378f4daa49b7e1e600d9088d
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     EXCLUDE_FROM_ALL)
-FetchContent_MakeAvailable(Boost)
+block(SCOPE_FOR VARIABLES)
+    # FindOpenSSL's Windows module re-searches for libraries that are not built yet.
+    set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+    set(OpenSSL_DIR "${REDIS_OPENSSL_PACKAGE_DIR}")
+    FetchContent_MakeAvailable(Boost)
+endblock()
 # Redis uses callbacks, not Asio spawn/Boost.Context's single-architecture assembly.
 get_target_property(_redis_dependencies boost_redis INTERFACE_LINK_LIBRARIES)
+if(NOT _redis_dependencies)
+    message(FATAL_ERROR "Boost.Redis dependency configuration failed; refusing an incomplete link interface")
+endif()
 list(REMOVE_ITEM _redis_dependencies Boost::asio)
 list(APPEND _redis_dependencies Boost::asio_core)
 set_property(TARGET boost_redis PROPERTY INTERFACE_LINK_LIBRARIES "${_redis_dependencies}")
@@ -88,3 +96,8 @@ add_test(NAME redis_transport COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_S
 set_tests_properties(redis_transport PROPERTIES TIMEOUT 60)
 add_test(NAME redis_load_unload COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tests/load_unload.py" "$<TARGET_FILE:redis>")
 set_tests_properties(redis_load_unload PROPERTIES TIMEOUT 30)
+FetchContent_GetProperties(Boost SOURCE_DIR _boost_source_dir)
+add_test(NAME redis_dependency_configuration COMMAND "${Python3_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/tests/test_cmake_dependencies.py"
+    --cmake "${CMAKE_COMMAND}" --boost-source "${_boost_source_dir}")
+set_tests_properties(redis_dependency_configuration PROPERTIES TIMEOUT 180)
