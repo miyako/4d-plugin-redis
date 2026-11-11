@@ -96,3 +96,6 @@ endif()
 set(OPENSSL_FOUND TRUE)
 set(OpenSSL_FOUND TRUE)
 set(OPENSSL_VERSION "3.5.9")
+set(REDIS_OPENSSL_PACKAGE_DIR "${CMAKE_BINARY_DIR}/private-openssl-package")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/OpenSSLConfig.cmake.in"
+    "${REDIS_OPENSSL_PACKAGE_DIR}/OpenSSLConfig.cmake" @ONLY)
