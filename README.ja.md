@@ -6,8 +6,10 @@
 
 [English](README.md) · [依存関係の選定と出所](docs/dependencies.md)
 
-**開発プレビュー 0.1.0。リリースは未公開です。** ビルド対象はmacOS universal
-（arm64/x86_64、デプロイメントターゲット11.0）とWindows x64です。対象と実証済みの
+**プレビューリリース [0.1.2](https://github.com/miyako/4d-plugin-redis/releases/tag/v0.1.2)
+を公開しました。** macOS universal（arm64/x86_64、デプロイメントターゲット11.0）と
+Windows x64のバイナリーを同梱します。macOS配布物はDeveloper ID署名・公証済みで、
+Windows実行ファイルは未署名です。対象と実証済みの
 環境の違いは[検証](#検証)を参照してください。サポートの下限は、実行環境での確認を
 基準に保守的に **4D 21.0** としています。古い4DではSDKをロードできない、という
 意味ではありません。`HELLO 3` と `SET KEEPTTL` のプロトコル機能上の下限は
@@ -19,14 +21,24 @@ UIを停止させる可能性があります。
 
 ## インストール
 
-ソースからビルドし、macOSでは `redis.bundle`、Windowsでは
-`Contents/Windows64/redis.4DX` を含む `redis` フォルダー全体をホストの
-`Plugins` にコピーして4Dを再起動します。実行ファイルだけをコピーしないでください。
+[0.1.2のZIP](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/redis-0.1.2.zip)
+（macOS／Windows共通）、またはmacOS用の
+[DMG](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/redis-0.1.2.dmg)
+をダウンロードします。[SHA256SUMS](https://github.com/miyako/4d-plugin-redis/releases/download/v0.1.2/SHA256SUMS)
+と出所・公証の記録もリリースページから取得できます。
+
+ZIPを展開するか、macOSでDMGをマウントし、`redis.bundle` ディレクトリー全体を
+ホストの `Plugins` にコピーして4Dを再起動します。このディレクトリーには
+`Contents/MacOS/redis`、`Contents/Windows64/redis.4DX` と必要なリソースを同梱します。
+実行ファイルだけをコピーしないでください。
 クライアント／サーバー構成では、コマンドを実行する各ホストにインストールします。
 接続ハンドルはデータベースやリモートクライアントではなく、そのランタイムに属します。
+再配布時は、同梱のライセンスと帰属表示のファイルを保持してください。
 
-ダウンロード可能なリリースはまだありません。ローカルビルドやCIのテスト用
-アドホック署名を、正式な署名・公証済み配布物とみなさないでください。
+[ソースからビルド](#ビルドとテスト)する場合は、生成された `redis.bundle`（macOS）、
+または `Contents/Windows64/redis.4DX` を含む `redis` フォルダー全体（Windows）を
+コピーします。ローカルビルドやCIのテスト用アドホック署名を、
+正式な署名・公証済み配布物とみなさないでください。
 
 ## 使用例
 
@@ -276,7 +288,10 @@ REDIS_TEST_TLS_CAも指定可能です。ポート指定なしのPASSはオフ�
 ### 検証
 
 実施済みの検証と未検証のプラットフォーム／配布条件は
-[docs/validation.md](docs/validation.md)に記録します。4D 21.0は実行確認による
+[docs/validation.md](docs/validation.md)に記録します。リリースCIではmacOS／Windowsの
+ネイティブテストとオフラインtool4d確認、およびmacOSの署名済みパッケージの
+スモークテストが成功しています。Windowsの実際の4D Text／BLOB APIとワーカー終了処理を
+実Redisに接続して確認する検証は未実施です。4D 21.0は実行確認による
 保守的な下限です。SDK経由で呼ぶ最も新しい言語コマンドは18 R3導入のOB Keys
 （1719）ですが、それだけで以前の全バージョンをサポートするとは判断しません。
 
@@ -299,9 +314,12 @@ REDIS_TEST_TLS_CAも指定可能です。ポート指定なしのPASSはオフ�
 APPLE_DEVELOPER_ID_CERTIFICATE、APPLE_DEVELOPER_ID_CERTIFICATE_PASSWORD、
 KEYCHAIN_PASSWORD、NOTARYTOOL_APPLE_ID、NOTARYTOOL_TEAM_ID、NOTARYTOOL_PASSWORD
 が必要です。正式な名前は生成されたワークフローを参照してください。設定はユーザーが
-行い、エージェントは認証情報を読み取り・アップロードしません。このプレビューでは
-署名設定や公開を行いません。macOS配布にはDeveloper ID署名・公証の受け入れ確認が
-必要で、Windows配布物は明示的に未署名です。
+行い、エージェントは認証情報を読み取り・アップロードしません。リリース処理は
+macOS配布物のDeveloper ID署名・公証、DMGへのチケットのステープルと評価、
+アーカイブ検証、署名済みプラグインのスモークテストを公開前に実行します。
+検証済みのドラフトリリースを作成し、メンテナーが公開します。
+Windows実行ファイルは未署名のままです。macOSバンドルの署名は、
+WindowsのAuthenticode署名ではありません。
 
 ## ライセンスと帰属
 
